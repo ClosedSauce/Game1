@@ -8,20 +8,20 @@ i = 0
 
 """ Logic for making another step in game """
 def update():
-	global updateStartTime, updateEndTime, fps, i
-	updateStartTime = time.time()	
-	draw()
-	i = i + 1
-	print("Frame " + str(i))
-	pygame.time.Clock().tick(fps)
+    global updateStartTime, updateEndTime, fps, i
+    updateStartTime = time.time()	
+    draw()
+    i = i + 1
+    print("Frame " + str(i))
+    pygame.time.Clock().tick(fps)
 
 def draw():
-        global screen
-        screen.fill((0, 0, 0))
-        pygame.display.flip()
+    global screen
+    screen.fill((0, 0, 0))
+    pygame.display.flip()
 
 while running:
-	event = pygame.event.poll()
-	if event.type == pygame.QUIT:
-		running = 0
-	update()
+    event = pygame.event.poll()
+    if event.type == pygame.QUIT:
+        running = 0
+    update()
