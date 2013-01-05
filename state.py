@@ -2,5 +2,5 @@
 class State:
     def update(self):
         pass
-    def draw(self):
+    def draw(self, screen):
         pass
