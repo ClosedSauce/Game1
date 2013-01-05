@@ -1,5 +1,7 @@
+# -*- coding: iso-8859-15 -*-
 import pygame
 import time
+import statemanager
 
 screen = pygame.display.set_mode((640, 400))
 running = 1
