@@ -18,7 +18,7 @@ def update():
     draw(screen)
     
     i = i + 1
-    print("Frame " + str(i))
+    #print("Frame " + str(i))
        
     
     statemanager.getActiveState().update()
