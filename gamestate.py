@@ -7,12 +7,14 @@ from collections import deque
 """ Everything in the gamearea is a block """
 class Block:
     blockSize = 10
-    offsetX = 30
-    offsetY = 150
+    #coordinates in blocks
+    x = 0
+    y = 0
     dirX = 1
     dirY = 0
     color = 255, 0, 0
     i = 0
+    
     
     def __init__(self):
         self.dirX = 1
@@ -22,8 +24,9 @@ class Block:
         pass
     
     def draw(self, screen):
-        block = pygame.Rect(self.offsetX, self.offsetY, self.blockSize, self.blockSize)
+        block = pygame.Rect(self.x * self.blockSize, self.y * self.blockSize, self.blockSize, self.blockSize)
         screen.fill(self.color, block)
+       
 
 """ Worm is basically a stack of blocks, which player can control """
 class Worm:
@@ -32,48 +35,54 @@ class Worm:
     startOffsetY = 4 #in blocks
     blockSize = 0
     
-    def __init__(self):
+    def __init__(self, gamestate):
         initialBlock = Block()
         secondBlock = Block()
         thirdBlock = Block()
         fourthBlock = Block()        
         self.blocks = deque([fourthBlock, thirdBlock, secondBlock, initialBlock])
+        self.gamestate = gamestate
 
-    """ Should only be called at the very start of the game """ 
-    def setBlocksize(self, blockSize): #@todo rename to more corresponding
+    """ Should only be called at the very start of the game """
+    def initWorld(self, blockSize):
         self.blockSize = blockSize
         for i, b in enumerate(self.blocks):
             b.blockSize = blockSize
             #We want to make the coordinates to the closest "block"
-            b.offsetX = self.startOffsetX * blockSize + i * blockSize
-            b.offsetY = self.startOffsetY * blockSize
+            b.x = self.startOffsetX  + i
+            b.y = self.startOffsetY
             
     
     def event(self, event):
         print("Keyevent at gamestate!")
-        if event.key == pygame.K_w:
-            self.blocks[len(self.blocks)-1].dirY = -1
-            self.blocks[len(self.blocks)-1].dirX = 0
-        if event.key == pygame.K_s:
-            self.blocks[len(self.blocks)-1].dirY = 1
-            self.blocks[len(self.blocks)-1].dirX = 0
-        if event.key == pygame.K_a:
-            self.blocks[len(self.blocks)-1].dirX = -1
-            self.blocks[len(self.blocks)-1].dirY = 0
-        if event.key == pygame.K_d:
-            self.blocks[len(self.blocks)-1].dirX = 1
-            self.blocks[len(self.blocks)-1].dirY = 0
+        b = self.blocks[len(self.blocks)-1]
+        if event.key == pygame.K_w and (b.dirY <> 1 and b.dirX <> 0):
+            b.dirY = -1
+            b.dirX = 0
+        if event.key == pygame.K_s and (b.dirY <> -1 and b.dirX <> 0):
+            b.dirY = 1
+            b.dirX = 0
+        if event.key == pygame.K_a and (b.dirX <> 1 and b.dirY <> 0):
+            b.dirX = -1
+            b.dirY = 0
+        if event.key == pygame.K_d and (b.dirX <> -1 and b.dirY <> 0):
+            b.dirX = 1
+            b.dirY = 0
     
     def update(self):
         self.i = self.i + 1
         
         if (self.i % 10 == 0): #Updating every 60th frame
             newBlock = copy.deepcopy(self.blocks[len(self.blocks)-1])
-            newBlock.offsetX = newBlock.offsetX + newBlock.blockSize * newBlock.dirX
-            newBlock.offsetY = newBlock.offsetY + newBlock.blockSize * newBlock.dirY
-            print("NewX: " + str(newBlock.offsetX) + " , len: " + str(len(self.blocks)))
-            self.blocks.append(newBlock)
-            self.blocks.popleft()
+            newBlock.x = newBlock.x + newBlock.dirX
+            newBlock.y = newBlock.y + newBlock.dirY
+            
+            if (self.gamestate.checkFreeSpace(newBlock.x, newBlock.y) == False):
+                print("Collision!")
+            else:
+                print("NewX: " + str(newBlock.x) + " , len: " + str(len(self.blocks)))
+                self.blocks.append(newBlock)
+                self.blocks.popleft()
 
     def draw(self, screen):
         for i, b in enumerate(self.blocks):
@@ -97,7 +106,7 @@ class GameState(State):
     height = 0
 
     def __init__(self):
-        self.worm = Worm()
+        self.worm = Worm(self)
 
     def event(self, event):
         self.worm.event(event)
@@ -131,4 +140,15 @@ class GameState(State):
         self.height = self.width
         
         if (self.worm.blockSize == 0):
-            self.worm.setBlocksize(self.blockSize)
+            self.worm.initWorld(self.blockSize)
+
+    #true if current coordinates are "free to be moved at", false if used, either by worm or walls
+    # x and y are block, so actual coordinates are x * blockSize
+    # Assumes that border is 1 block in width
+    def checkFreeSpace(self, x, y):
+        if (x <= 0 or y <= 0 or x * self.blockSize >= (self.width - self.blockSize) or y * self.blockSize >= (self.height - self.blockSize)):
+            return False
+        for i, b in enumerate(self.worm.blocks):
+            if (b.x == x and b.y == y):
+                return False
+        return True
