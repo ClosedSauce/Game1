@@ -34,8 +34,27 @@ class Worm:
         initialBlock = Block()
         secondBlock = Block()
         secondBlock.offsetX = 140
-        self.blocks = deque([secondBlock, initialBlock])
+        thirdBlock = Block()
+        thirdBlock.offsetX = 130
+        fourthBlock = Block()
+        fourthBlock.offsetX = 120
+        self.blocks = deque([fourthBlock, thirdBlock, secondBlock, initialBlock])
 
+    def event(self, event):
+        print("Keyevent at gamestate!")
+        if event.key == pygame.K_w:
+            self.blocks[len(self.blocks)-1].dirY = -1
+            self.blocks[len(self.blocks)-1].dirX = 0
+        if event.key == pygame.K_s:
+            self.blocks[len(self.blocks)-1].dirY = 1
+            self.blocks[len(self.blocks)-1].dirX = 0
+        if event.key == pygame.K_a:
+            self.blocks[len(self.blocks)-1].dirX = -1
+            self.blocks[len(self.blocks)-1].dirY = 0
+        if event.key == pygame.K_d:
+            self.blocks[len(self.blocks)-1].dirX = 1
+            self.blocks[len(self.blocks)-1].dirY = 0
+    
     def update(self):
         self.i = self.i + 1
         
@@ -46,10 +65,6 @@ class Worm:
             print("NewX: " + str(newBlock.offsetX) + " , len: " + str(len(self.blocks)))
             self.blocks.append(newBlock)
             self.blocks.popleft()
-        elif (self.i > 300): #testing simple turning
-            self.blocks[len(self.blocks)-1].dirY = 1
-            self.blocks[len(self.blocks)-1].dirX = 0
-            self.i = self.i - 300
 
     def draw(self, screen):
         for i, b in enumerate(self.blocks):
@@ -69,8 +84,8 @@ class GameState(State):
     def __init__(self):
         self.worm = Worm()
 
-    def event(self):
-        pass
+    def event(self, event):
+        self.worm.event(event)
     
     def update(self):
         #here comes the game logic, reading the user input, etc

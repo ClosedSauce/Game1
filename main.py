@@ -19,7 +19,6 @@ def update():
     
     i = i + 1
     #print("Frame " + str(i))
-       
     
     statemanager.getActiveState().update()
     pygame.time.Clock().tick(fps)
@@ -35,6 +34,7 @@ while running:
     if event.type == pygame.QUIT:
         running = 0
     elif event.type == pygame.KEYDOWN:
+        statemanager.getActiveState().event(event)
         print("Keydown: " + str(event.key))
         if event.key == pygame.K_p:
             if (isinstance(statemanager.getActiveState(), GameState)):
