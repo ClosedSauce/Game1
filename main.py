@@ -3,7 +3,7 @@ import pygame
 import time
 from statemanager import *
 
-screen = pygame.display.set_mode((640, 400))
+screen = pygame.display.set_mode((400, 400))
 pygame.font.init()
 statemanager = StateManager()
 running = 1
@@ -21,7 +21,7 @@ def update():
     #print("Frame " + str(i))
     
     statemanager.getActiveState().update()
-    pygame.time.Clock().tick(fps)
+    pygame.time.Clock().tick(60)
 
 def draw(screen):
     global activestate
@@ -34,8 +34,8 @@ while running:
     if event.type == pygame.QUIT:
         running = 0
     elif event.type == pygame.KEYDOWN:
-        statemanager.getActiveState().event(event)
         print("Keydown: " + str(event.key))
+        statemanager.getActiveState().event(event)
         if event.key == pygame.K_p:
             if (isinstance(statemanager.getActiveState(), GameState)):
                 print("Setting activestate to pausestate")
