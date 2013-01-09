@@ -56,23 +56,24 @@ class Worm:
     def event(self, event):
         print("Keyevent at gamestate!")
         b = self.blocks[len(self.blocks)-1]
-        if event.key == pygame.K_w and (b.dirY <> 1 and b.dirX <> 0):
+        b2 = self.blocks[len(self.blocks)-2] #to check that cannot move to previous block "inside itself"
+        if event.key == pygame.K_w and (b.y - 1 <> b2.y or b.x <> b2.x):
             b.dirY = -1
             b.dirX = 0
-        if event.key == pygame.K_s and (b.dirY <> -1 and b.dirX <> 0):
+        if event.key == pygame.K_s and (b.y + 1 <> b2.y or b.x <> b2.x):
             b.dirY = 1
             b.dirX = 0
-        if event.key == pygame.K_a and (b.dirX <> 1 and b.dirY <> 0):
+        if event.key == pygame.K_a and (b.y <> b2.y or b.x - 1 <> b2.x):
             b.dirX = -1
             b.dirY = 0
-        if event.key == pygame.K_d and (b.dirX <> -1 and b.dirY <> 0):
+        if event.key == pygame.K_d and (b.y <> b2.y or b.x + 1 <> b2.x):
             b.dirX = 1
             b.dirY = 0
     
     def update(self):
         self.i = self.i + 1
         
-        if (self.i % 10 == 0): #Updating every 60th frame
+        if self.i % 10 == 0: #Updating every 60th frame
             newBlock = copy.deepcopy(self.blocks[len(self.blocks)-1])
             newBlock.x = newBlock.x + newBlock.dirX
             newBlock.y = newBlock.y + newBlock.dirY
