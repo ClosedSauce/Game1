@@ -42,6 +42,7 @@ class Worm:
         fourthBlock = Block()        
         self.blocks = deque([fourthBlock, thirdBlock, secondBlock, initialBlock])
         self.gamestate = gamestate
+        self.keyQueue = deque([]) #stores keypresses, so they can be chained
 
     """ Should only be called at the very start of the game """
     def initWorld(self, blockSize):
@@ -55,25 +56,31 @@ class Worm:
     
     def event(self, event):
         print("Keyevent at gamestate!")
-        b = self.blocks[len(self.blocks)-1]
-        b2 = self.blocks[len(self.blocks)-2] #to check that cannot move to previous block "inside itself"
-        if event.key == pygame.K_w and (b.y - 1 <> b2.y or b.x <> b2.x):
-            b.dirY = -1
-            b.dirX = 0
-        if event.key == pygame.K_s and (b.y + 1 <> b2.y or b.x <> b2.x):
-            b.dirY = 1
-            b.dirX = 0
-        if event.key == pygame.K_a and (b.y <> b2.y or b.x - 1 <> b2.x):
-            b.dirX = -1
-            b.dirY = 0
-        if event.key == pygame.K_d and (b.y <> b2.y or b.x + 1 <> b2.x):
-            b.dirX = 1
-            b.dirY = 0
+        self.keyQueue.append(event.key)        
     
     def update(self):
         self.i = self.i + 1
         
         if self.i % 10 == 0: #Updating every 60th frame
+            
+            #take a one keypress from the keyQueue, leave the rest
+            if len(self.keyQueue) > 0:
+                key = self.keyQueue.popleft()
+                b = self.blocks[len(self.blocks)-1]
+                b2 = self.blocks[len(self.blocks)-2] #to check that cannot move to previous block "inside itself"
+                if key == pygame.K_w and (b.y - 1 <> b2.y or b.x <> b2.x):
+                    b.dirY = -1
+                    b.dirX = 0
+                if key == pygame.K_s and (b.y + 1 <> b2.y or b.x <> b2.x):
+                    b.dirY = 1
+                    b.dirX = 0
+                if key == pygame.K_a and (b.y <> b2.y or b.x - 1 <> b2.x):
+                    b.dirX = -1
+                    b.dirY = 0
+                if key == pygame.K_d and (b.y <> b2.y or b.x + 1 <> b2.x):
+                    b.dirX = 1
+                    b.dirY = 0
+            
             newBlock = copy.deepcopy(self.blocks[len(self.blocks)-1])
             newBlock.x = newBlock.x + newBlock.dirX
             newBlock.y = newBlock.y + newBlock.dirY
