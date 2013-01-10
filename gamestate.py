@@ -68,16 +68,16 @@ class Worm:
                 key = self.keyQueue.popleft()
                 b = self.blocks[len(self.blocks)-1]
                 b2 = self.blocks[len(self.blocks)-2] #to check that cannot move to previous block "inside itself"
-                if key == pygame.K_w and (b.y - 1 <> b2.y or b.x <> b2.x):
+                if key == pygame.K_UP and (b.y - 1 <> b2.y or b.x <> b2.x):
                     b.dirY = -1
                     b.dirX = 0
-                if key == pygame.K_s and (b.y + 1 <> b2.y or b.x <> b2.x):
+                if key == pygame.K_DOWN and (b.y + 1 <> b2.y or b.x <> b2.x):
                     b.dirY = 1
                     b.dirX = 0
-                if key == pygame.K_a and (b.y <> b2.y or b.x - 1 <> b2.x):
+                if key == pygame.K_LEFT and (b.y <> b2.y or b.x - 1 <> b2.x):
                     b.dirX = -1
                     b.dirY = 0
-                if key == pygame.K_d and (b.y <> b2.y or b.x + 1 <> b2.x):
+                if key == pygame.K_RIGHT and (b.y <> b2.y or b.x + 1 <> b2.x):
                     b.dirX = 1
                     b.dirY = 0
             
@@ -113,10 +113,16 @@ class GameState(State):
     width = 0
     height = 0
 
+    score = 0
+    
     def __init__(self):
         self.worm = Worm(self)
         self.smallFont = pygame.font.Font("04B_03__.TTF", 16)
 
+    def reset(self):
+        self.worm = Worm(self)
+        self.score = 0
+    
     def event(self, event):
         self.worm.event(event)
     
@@ -133,7 +139,7 @@ class GameState(State):
         screen.fill(self.borderColor, borderArea)
         screen.fill(self.playAreaColor, playArea)
 
-        label = self.smallFont.render("Score: ", 1, (155,155,155))
+        label = self.smallFont.render("Score: " + str(self.score), 1, (155,155,155))
         screen.blit(label, (self.blockSize, 3))
         
         self.worm.draw(screen)
