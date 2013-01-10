@@ -12,7 +12,7 @@ class Block:
     y = 0
     dirX = 1
     dirY = 0
-    color = 255, 0, 0
+    color = 155, 155, 155
     i = 0
     
     
@@ -91,8 +91,8 @@ class Worm:
 
 class GameState(State):
     backgroundColor = 0, 0, 0
-    borderColor = 100, 100, 100
-    playAreaColor = 200, 200, 200
+    borderColor = 0, 0, 0
+    playAreaColor = 75, 75, 75
     
     """ Game is made of certain sized blocks. Sort of "big pixels" """
     #from how many blocks the game area is formed from
@@ -108,6 +108,7 @@ class GameState(State):
 
     def __init__(self):
         self.worm = Worm(self)
+        self.smallFont = pygame.font.Font("04B_03__.TTF", 16)
 
     def event(self, event):
         self.worm.event(event)
@@ -124,6 +125,9 @@ class GameState(State):
         playArea = pygame.Rect(self.offsetX + self.blockSize, self.offsetY + self.blockSize, self.width - 2 * self.blockSize, self.height - 2 * self.blockSize)
         screen.fill(self.borderColor, borderArea)
         screen.fill(self.playAreaColor, playArea)
+
+        label = self.smallFont.render("Score: ", 1, (155,155,155))
+        screen.blit(label, (self.blockSize, 3))
         
         self.worm.draw(screen)
         
