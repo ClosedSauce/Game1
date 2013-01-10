@@ -34,14 +34,25 @@ while running:
     if event.type == pygame.QUIT:
         running = 0
     elif event.type == pygame.KEYDOWN:
+        activeState = statemanager.getActiveState()
         print("Keydown: " + str(event.key))
-        statemanager.getActiveState().event(event)
-        if event.key == pygame.K_p:
-            if (isinstance(statemanager.getActiveState(), GameState)):
-                print("Setting activestate to pausestate")
-                statemanager.setActiveState(statemanager.pausestate)
-            elif (isinstance(statemanager.getActiveState(), PauseState)):
+        activeState.event(event)
+        if event.key == pygame.K_ESCAPE:
+            if (isinstance(activeState, GameState)):
+                print("Setting activestate to menustate")
+                statemanager.setActiveState(statemanager.menustate)
+            elif (isinstance(activeState, MenuState)):
                 print("Setting activestate to gamestate")
                 statemanager.setActiveState(statemanager.gamestate)
-
+                
+        if event.key == pygame.K_RETURN:
+            if (isinstance(activeState, MenuState)):
+                if activeState.menuitems[activeState.selected] == "RESUME":
+                    statemanager.setActiveState(statemanager.gamestate)
+                if activeState.menuitems[activeState.selected] == "NEW GAME":
+                    activeState.selected = 0 #resume will be selected by default
+                    statemanager.gamestate.reset()
+                    statemanager.setActiveState(statemanager.gamestate)
+                if activeState.menuitems[activeState.selected] == "QUIT":
+                    running = 0
     update()
