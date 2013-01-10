@@ -7,7 +7,7 @@ screen = pygame.display.set_mode((400, 400))
 pygame.font.init()
 statemanager = StateManager()
 running = 1
-fps = 100
+fps = 60
 i = 0
 
 """ Logic for making another step in game """
@@ -21,7 +21,7 @@ def update():
     #print("Frame " + str(i))
     
     statemanager.getActiveState().update()
-    pygame.time.Clock().tick(60)
+    pygame.time.Clock().tick(fps)
 
 def draw(screen):
     global activestate
@@ -51,7 +51,7 @@ while running:
                     statemanager.setActiveState(statemanager.gamestate)
                 if activeState.menuitems[activeState.selected] == "NEW GAME":
                     activeState.selected = 0 #resume will be selected by default
-                    statemanager.gamestate.reset()
+                    statemanager.gamestate.reset(screen)
                     statemanager.setActiveState(statemanager.gamestate)
                 if activeState.menuitems[activeState.selected] == "QUIT":
                     running = 0
