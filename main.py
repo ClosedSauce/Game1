@@ -29,17 +29,21 @@ while running:
     if event.type == pygame.QUIT:
         running = 0
     elif event.type == pygame.KEYDOWN:
+        #Disable "Resume" if game is over in gamestate
+        if statemanager.gamestate.gameover == True:
+            statemanager.menustate.setGameResumable(False)
+            
         activeState = statemanager.getActiveState()
         print("Keydown: " + str(event.key))
         activeState.event(event)
         if event.key == pygame.K_ESCAPE:
-            if (isinstance(activeState, GameState)):
+            if isinstance(activeState, GameState):
                 print("Setting activestate to menustate")
                 statemanager.setActiveState(statemanager.menustate)
-            elif (isinstance(activeState, MenuState) and statemanager.menustate.isGameResumable() == True):
+            elif isinstance(activeState, MenuState) and statemanager.menustate.isGameResumable() == True:
                 print("Setting activestate to gamestate")
                 statemanager.setActiveState(statemanager.gamestate)
-            elif (isinstance(activeState, ScoreState)):
+            elif isinstance(activeState, ScoreState):
                 print("Setting activestate to menustate")
                 statemanager.setActiveState(statemanager.menustate)
         if event.key == pygame.K_RETURN:

@@ -53,7 +53,7 @@ class Worm:
     i = 0
     startOffsetX = 4 #in blocks
     startOffsetY = 4 #in blocks
-    blockSize = 0
+    blockSize = 0    
     
     def __init__(self, gamestate):
         initialBlock = Block()
@@ -63,7 +63,8 @@ class Worm:
         self.blocks = deque([fourthBlock, thirdBlock, secondBlock, initialBlock])
         self.gamestate = gamestate
         self.keyQueue = deque([]) #stores keypresses, so they can be chained
-
+        self.hp = 1
+    
     """ Should only be called at the very start of the game """
     def initWorld(self, blockSize):
         self.blockSize = blockSize
@@ -108,9 +109,11 @@ class Worm:
             collision = self.gamestate.checkCollision(newBlock.x, newBlock.y)            
             if collision == 1:
                 print("Collision with wall!")
+                self.hp -= 1
             #following special checks are so that worm can "go around", following its own tail
             elif collision == 2 and (newBlock.x <> self.blocks[0].x or newBlock.y <> self.blocks[0].y):
                 print("Collision with worm!")
+                self.hp -= 1
                 #print("Collision, new coords " + str(newBlock.x) + ", " + str(newBlock.y) + " vs " + str(self.blocks[0].x) + ", " + str(self.blocks[0].y))
             elif collision == 3:
                 print("Omnomnom")
@@ -128,6 +131,7 @@ class GameState(State):
     backgroundColor = 0, 0, 0
     borderColor = 0, 0, 0
     playAreaColor = 75, 75, 75
+    gameover = False
     
     """ Game is made of certain sized blocks. Sort of "big pixels" """
     #from how many blocks the game area is formed from
@@ -157,7 +161,8 @@ class GameState(State):
     
     def __init__(self):
         self.smallFont = pygame.font.Font("04B_03__.TTF", 16)
-    
+        self.bigfont = pygame.font.Font("04B_03__.TTF", 56)
+        
     def reset(self, screen):
         self.worm = Worm(self)
         self.score = 0
@@ -165,19 +170,24 @@ class GameState(State):
         self.food.block.color = (200, 200, 0)        
         self.initLevel(screen.get_width(), screen.get_height())
         self.randomizeFoodPos()
+        self.gameover = False
         
     def event(self, event):
-        self.worm.event(event)
+        if self.worm.hp > 0:
+            self.worm.event(event)
     
     def update(self):
         #here comes the game logic, reading the user input, etc
-        self.worm.update()
-        self.food.update()
+        if self.worm.hp > 0:
+            self.worm.update()
+            self.food.update()
+        else:
+            self.gameover = True
         
     def draw(self, screen):
         #here we draw the actual game
         screen.fill(self.backgroundColor)
-            
+        
         borderArea = pygame.Rect(self.offsetX, self.offsetY, self.width, self.height)
         playArea = pygame.Rect(self.offsetX + self.blockSize, self.offsetY + self.blockSize, self.width - 2 * self.blockSize, self.height - 2 * self.blockSize)
         screen.fill(self.borderColor, borderArea)
@@ -189,7 +199,24 @@ class GameState(State):
         
         self.worm.draw(screen)
         self.food.draw(screen)
-        
+
+        if self.gameover == True:
+            #We create a partial transparent fill to the gamescreen
+            dimSurface = pygame.Surface((screen.get_width(), screen.get_height()))
+            dimSurface.set_alpha(128)
+            dimSurface.fill((0, 0, 0))
+            screen.blit(dimSurface, (0,0))
+            
+            label = self.bigfont.render("GAME OVER", 1, (255,255,0))
+            (textW, textH) = self.bigfont.size("GAME OVER")
+            posX = screen.get_width() / 2 - textW / 2
+            screen.blit(label, (posX, 20))
+
+            label = self.smallFont.render("Press ESC to enter menu", 1, (255,255,0))
+            (textW, textH) = self.smallFont.size("Press ESC to enter menu")
+            posX = screen.get_width() / 2 - textW / 2
+            screen.blit(label, (posX, screen.get_height() / 2))
+
         pygame.display.flip()
         
     def initLevel(self, width, height):
