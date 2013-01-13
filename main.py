@@ -36,18 +36,29 @@ while running:
             if (isinstance(activeState, GameState)):
                 print("Setting activestate to menustate")
                 statemanager.setActiveState(statemanager.menustate)
-            elif (isinstance(activeState, MenuState)):
+            elif (isinstance(activeState, MenuState) and statemanager.menustate.isGameResumable() == True):
                 print("Setting activestate to gamestate")
                 statemanager.setActiveState(statemanager.gamestate)
+            elif (isinstance(activeState, ScoreState)):
+                print("Setting activestate to menustate")
+                statemanager.setActiveState(statemanager.menustate)
         if event.key == pygame.K_RETURN:
             if (isinstance(activeState, MenuState)):
                 if activeState.menuitems[activeState.selected] == "RESUME":
                     statemanager.setActiveState(statemanager.gamestate)
                 if activeState.menuitems[activeState.selected] == "NEW GAME":
-                    activeState.selected = 0 #resume will be selected by default
+                    activeState.selected = 0 #default selected menu item
                     statemanager.gamestate.reset(screen)
                     statemanager.setActiveState(statemanager.gamestate)
                     statemanager.menustate.setGameResumable(True)
+                if activeState.menuitems[activeState.selected] == "HIGH SCORE":
+                    statemanager.setActiveState(statemanager.scorestate)
                 if activeState.menuitems[activeState.selected] == "QUIT":
                     running = 0
-    update()
+            elif (isinstance(activeState, ScoreState)):
+                print("Setting activestate to menustate")
+                statemanager.setActiveState(statemanager.menustate)
+    if running == 0:
+        pygame.quit()
+    else:
+        update()

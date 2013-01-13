@@ -6,15 +6,18 @@ class MenuState(State):
     def __init__(self):
         self.bigfont = pygame.font.Font("04B_03__.TTF", 56)
         self.mediumfont = pygame.font.Font("04B_03__.TTF", 24)
-        self.selected = 1
+        self.selected = 0
         self.setGameResumable(False)
     
     def setGameResumable(self, r):
         self.resumable = r
         if r == False:
-            self.menuitems = ["NEW GAME", "QUIT"]
+            self.menuitems = ["NEW GAME", "HIGH SCORE", "QUIT"]
         else:
-            self.menuitems = ["RESUME", "NEW GAME", "QUIT"]
+            self.menuitems = ["RESUME", "NEW GAME", "HIGH SCORE", "QUIT"]
+
+    def isGameResumable(self):
+        return self.resumable
     
     def event(self, event):
         key = event.key
