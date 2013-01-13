@@ -7,7 +7,7 @@ class MenuState(State):
         self.bigfont = pygame.font.Font("04B_03__.TTF", 56)
         self.mediumfont = pygame.font.Font("04B_03__.TTF", 24)
         self.selected = 1
-        self.setGameResumable(True)
+        self.setGameResumable(False)
     
     def setGameResumable(self, r):
         self.resumable = r

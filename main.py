@@ -14,12 +14,9 @@ i = 0
 def update():
     global fps, i, screen, pygame
     updateStartTime = time.time()
-    
     draw(screen)
-    
     i = i + 1
     #print("Frame " + str(i))
-    
     statemanager.getActiveState().update()
     pygame.time.Clock().tick(fps)
 
@@ -28,9 +25,7 @@ def draw(screen):
     statemanager.getActiveState().draw(screen)
 
 while running:
-    
     event = pygame.event.poll()
-    
     if event.type == pygame.QUIT:
         running = 0
     elif event.type == pygame.KEYDOWN:
@@ -44,7 +39,6 @@ while running:
             elif (isinstance(activeState, MenuState)):
                 print("Setting activestate to gamestate")
                 statemanager.setActiveState(statemanager.gamestate)
-                
         if event.key == pygame.K_RETURN:
             if (isinstance(activeState, MenuState)):
                 if activeState.menuitems[activeState.selected] == "RESUME":
@@ -53,6 +47,7 @@ while running:
                     activeState.selected = 0 #resume will be selected by default
                     statemanager.gamestate.reset(screen)
                     statemanager.setActiveState(statemanager.gamestate)
+                    statemanager.menustate.setGameResumable(True)
                 if activeState.menuitems[activeState.selected] == "QUIT":
                     running = 0
     update()
