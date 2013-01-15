@@ -28,14 +28,17 @@ while running:
     event = pygame.event.poll()
     if event.type == pygame.QUIT:
         running = 0
-    elif event.type == pygame.KEYDOWN:
-        #Disable "Resume" if game is over in gamestate
-        if statemanager.gamestate.gameover == True:
-            statemanager.menustate.setGameResumable(False)
-            
+    elif event.type == pygame.KEYDOWN:        
         activeState = statemanager.getActiveState()
-        print("Keydown: " + str(event.key))
-        activeState.event(event)
+        print("Keydown: " + str(event.key))        
+        
+        #Disable "Resume" if game is over in gamestate
+        if isinstance(activeState, GameState) and statemanager.gamestate.gameover == True:
+            statemanager.menustate.setGameResumable(False)
+            statemanager.scorestate.inputScore = statemanager.gamestate.score
+            statemanager.scorestate.readInput = True
+            statemanager.setActiveState(statemanager.scorestate)
+        
         if event.key == pygame.K_ESCAPE:
             if isinstance(activeState, GameState):
                 print("Setting activestate to menustate")
@@ -47,7 +50,7 @@ while running:
                 print("Setting activestate to menustate")
                 statemanager.setActiveState(statemanager.menustate)
         if event.key == pygame.K_RETURN:
-            if (isinstance(activeState, MenuState)):
+            if isinstance(activeState, MenuState):
                 if activeState.menuitems[activeState.selected] == "RESUME":
                     statemanager.setActiveState(statemanager.gamestate)
                 if activeState.menuitems[activeState.selected] == "NEW GAME":
@@ -59,9 +62,11 @@ while running:
                     statemanager.setActiveState(statemanager.scorestate)
                 if activeState.menuitems[activeState.selected] == "QUIT":
                     running = 0
-            elif (isinstance(activeState, ScoreState)):
+            elif isinstance(activeState, ScoreState) and statemanager.scorestate.readInput == False:
                 print("Setting activestate to menustate")
                 statemanager.setActiveState(statemanager.menustate)
+        
+        activeState.event(event)
     if running == 0:
         pygame.quit()
     else:

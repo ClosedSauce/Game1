@@ -1,14 +1,63 @@
 # -*- coding: iso-8859-15 -*-
 import pygame
 from state import *
+import pickle
 
 class ScoreState(State):
+    maxScores = 5
+    scoreFile = 'scores.pkl'
+    inputName = ''
+    inputScore = 0
+    
     def __init__(self):
         self.bigfont = pygame.font.Font("04B_03__.TTF", 56)
         self.mediumfont = pygame.font.Font("04B_03__.TTF", 24)
-    
+        self.smallfont = pygame.font.Font("04B_03__.TTF", 16)
+        try:
+            scoreFile = open(self.scoreFile, 'w+b')
+            self.scores = pickle.load(scoreFile)
+        except (pickle.PickleError, EOFError):
+            print("Error reading the pickle file... No scores loaded")
+            self.scores = []
+
+    #Returns the position in high scores, 0 if didn't make it to the list, -1 on error
+    def addScore(self, score, name):
+        i = 0
+        scoresLen = len(self.scores)
+        if scoresLen == 0:
+            self.scores.insert(0, [score, name])
+        else:
+            for s in self.scores:
+                if i < (self.maxScores - 1) and score >= s[0]:
+                    self.scores.insert(i, [score, name])                
+                    i += 1
+                    break
+                elif i == (self.maxScores - 1):
+                    i = 0
+                else:
+                    i += 1
+                
+        print("Scores: " + str(self.scores))
+        
+        try:
+            output = open(self.scoreFile, 'wb')
+            pickle.dump(self.scores, output)
+            output.close()
+            return i
+        except pickle.PickleError:
+            print("Error writing the pickle file... No scores written")
+            return -1
+
     def event(self, event):
-        pass
+        if self.readInput == True:
+            if event.type == pygame.KEYDOWN:
+                if event.unicode.isalpha():
+                    self.inputName += event.unicode
+                elif event.key == pygame.K_BACKSPACE:
+                    self.inputName = self.inputName[:-1]
+                elif event.key == pygame.K_RETURN:
+                    self.readInput = False
+                    self.addScore(self.inputScore, self.inputName)
             
     def update(self):
         #here comes the game logic, reading the user input, etc
@@ -22,4 +71,31 @@ class ScoreState(State):
         posX = screen.get_width() / 2 - textW / 2
         screen.blit(label, (posX, 20))
         
+        if self.readInput == True:
+            label = self.smallfont.render("You made it to highscores!", 1, (255,255,0))
+            (textW, textH) = self.smallfont.size("You made it to highscores!")
+            posX = screen.get_width() / 2 - textW / 2
+            screen.blit(label, (posX, 80))
+
+            label = self.smallfont.render("Please input your name:", 1, (255,255,0))
+            (textW, textH) = self.smallfont.size("Please input your name:")
+            posX = screen.get_width() / 2 - textW / 2
+            screen.blit(label, (posX, 120))
+
+            label = self.bigfont.render(self.inputName, 1, (255,255,0))
+            (textW, textH) = self.bigfont.size(self.inputName)
+            posX = screen.get_width() / 2 - textW / 2
+            screen.blit(label, (posX, 160))
+        else:
+            i = 0
+            for s in self.scores:
+                i += 1
+                label = self.mediumfont.render(str(i) + ". " + s[1] + " - " + str(s[0]), 1, (255,255,0))
+                (textW, textH) = self.mediumfont.size(str(i) + ". " + s[1] + " - " + str(s[0]))
+                posX = screen.get_width() / 2 - textW / 2
+                screen.blit(label, (posX, 80 + i * 20))
+                
         pygame.display.flip()
+            
+    def readUserInput(self):
+        self.readInput = True
