@@ -52,6 +52,7 @@ class ScoreState(State):
         scoreAdded = False
         if scoresLen == 0:
             self.scores.insert(0, [score, name])
+            scoreAdded = True
         else:
             for s in self.scores:
                 if i < (self.maxScores - 1) and score > s[0]:
