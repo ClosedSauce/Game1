@@ -4,7 +4,7 @@ from state import *
 import pickle
 
 class ScoreState(State):
-    maxScores = 5
+    maxScores = 10
     scoreFile = 'scores.pkl'
     inputName = ''
     inputScore = 0
@@ -21,42 +21,52 @@ class ScoreState(State):
             self.scores = u.load()
             scoreFile.close()
             print("Read pickle: " + str(self.scores))
-        except (pickle.PickleError, EOFError) as e:
-            print("Error reading the pickle file... No scores loaded" + str(e))
+        except (pickle.PickleError, EOFError, IOError) as e:
+            print("Error reading the pickle file... No scores loaded: " + str(e))
             self.scores = []
 
     #Returns the position in high scores, 0 if didn't make it to the list, -1 on error
     def checkScorePos(self, score):
         i = 0
         scoresLen = len(self.scores)
+        if scoresLen == 0:
+            return 1
         for s in self.scores:
             if i < (self.maxScores - 1) and score > s[0]:
                 i += 1
                 return i
                 break
             elif i == (self.maxScores - 1):
-                i = 0
+                return 0
             else:
                 i += 1
-        return 0
+        if scoresLen < (self.maxScores):
+            return (len(self.scores) + 1)
+        else:
+            return 0
 
     #Returns the position in high scores, 0 if didn't make it to the list, -1 on error
     def addScore(self, score, name):
         i = 0
         scoresLen = len(self.scores)
+        scoreAdded = False
         if scoresLen == 0:
             self.scores.insert(0, [score, name])
         else:
             for s in self.scores:
-                if i < (self.maxScores - 1) and score >= s[0]:
-                    self.scores.insert(i, [score, name])                
-                    self.scores.pop()
+                if i < (self.maxScores - 1) and score > s[0]:
+                    self.scores.insert(i, [score, name])
+                    scoreAdded = True
+                    if len(self.scores) > self.maxScores:
+                        self.scores.pop()
                     break
                 elif i == (self.maxScores - 1):
                     i = 0
                 else:
                     i += 1
-                
+        #Special case, score isnt greater than old scores, but there arent yet enough scores to populate the list
+        if scoreAdded == False and scoresLen < self.maxScores:
+            self.scores.insert(i, [score, name])
         print("Scores: " + str(self.scores))
         
         try:
