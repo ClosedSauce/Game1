@@ -8,17 +8,37 @@ class ScoreState(State):
     scoreFile = 'scores.pkl'
     inputName = ''
     inputScore = 0
+    readInput = False
+    maxNameLength = 3
     
     def __init__(self):
         self.bigfont = pygame.font.Font("04B_03__.TTF", 56)
         self.mediumfont = pygame.font.Font("04B_03__.TTF", 24)
         self.smallfont = pygame.font.Font("04B_03__.TTF", 16)
         try:
-            scoreFile = open(self.scoreFile, 'w+b')
-            self.scores = pickle.load(scoreFile)
-        except (pickle.PickleError, EOFError):
-            print("Error reading the pickle file... No scores loaded")
+            scoreFile = open(self.scoreFile, 'rb')
+            u = pickle.Unpickler(scoreFile)
+            self.scores = u.load()
+            scoreFile.close()
+            print("Read pickle: " + str(self.scores))
+        except (pickle.PickleError, EOFError) as e:
+            print("Error reading the pickle file... No scores loaded" + str(e))
             self.scores = []
+
+    #Returns the position in high scores, 0 if didn't make it to the list, -1 on error
+    def checkScorePos(self, score):
+        i = 0
+        scoresLen = len(self.scores)
+        for s in self.scores:
+            if i < (self.maxScores - 1) and score > s[0]:
+                i += 1
+                return i
+                break
+            elif i == (self.maxScores - 1):
+                i = 0
+            else:
+                i += 1
+        return 0
 
     #Returns the position in high scores, 0 if didn't make it to the list, -1 on error
     def addScore(self, score, name):
@@ -30,7 +50,7 @@ class ScoreState(State):
             for s in self.scores:
                 if i < (self.maxScores - 1) and score >= s[0]:
                     self.scores.insert(i, [score, name])                
-                    i += 1
+                    self.scores.pop()
                     break
                 elif i == (self.maxScores - 1):
                     i = 0
@@ -52,7 +72,8 @@ class ScoreState(State):
         if self.readInput == True:
             if event.type == pygame.KEYDOWN:
                 if event.unicode.isalpha():
-                    self.inputName += event.unicode
+                    if len(self.inputName) < self.maxNameLength:
+                        self.inputName += event.unicode
                 elif event.key == pygame.K_BACKSPACE:
                     self.inputName = self.inputName[:-1]
                 elif event.key == pygame.K_RETURN:

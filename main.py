@@ -35,11 +35,11 @@ while running:
         #Disable "Resume" if game is over in gamestate
         if isinstance(activeState, GameState) and statemanager.gamestate.gameover == True:
             statemanager.menustate.setGameResumable(False)
-            statemanager.scorestate.inputScore = statemanager.gamestate.score
-            statemanager.scorestate.readInput = True
+            if statemanager.scorestate.checkScorePos(statemanager.gamestate.score) > 0:
+                statemanager.scorestate.inputScore = statemanager.gamestate.score
+                statemanager.scorestate.readInput = True
             statemanager.setActiveState(statemanager.scorestate)
-        
-        if event.key == pygame.K_ESCAPE:
+        elif event.key == pygame.K_ESCAPE:
             if isinstance(activeState, GameState):
                 print("Setting activestate to menustate")
                 statemanager.setActiveState(statemanager.menustate)
@@ -49,7 +49,7 @@ while running:
             elif isinstance(activeState, ScoreState):
                 print("Setting activestate to menustate")
                 statemanager.setActiveState(statemanager.menustate)
-        if event.key == pygame.K_RETURN:
+        elif event.key == pygame.K_RETURN:
             if isinstance(activeState, MenuState):
                 if activeState.menuitems[activeState.selected] == "RESUME":
                     statemanager.setActiveState(statemanager.gamestate)

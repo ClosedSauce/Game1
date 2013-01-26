@@ -203,7 +203,7 @@ class GameState(State):
         if self.gameover == True:
             #We create a partial transparent fill to the gamescreen
             dimSurface = pygame.Surface((screen.get_width(), screen.get_height()))
-            dimSurface.set_alpha(128)
+            dimSurface.set_alpha(192)
             dimSurface.fill((0, 0, 0))
             screen.blit(dimSurface, (0,0))
             
@@ -212,10 +212,10 @@ class GameState(State):
             posX = screen.get_width() / 2 - textW / 2
             screen.blit(label, (posX, 20))
 
-            label = self.smallFont.render("Press ESC to enter menu", 1, (255,255,0))
+            label = self.smallFont.render("Press any key to continue", 1, (255,255,0))
             (textW, textH) = self.smallFont.size("Press ESC to enter menu")
             posX = screen.get_width() / 2 - textW / 2
-            screen.blit(label, (posX, screen.get_height() / 2))
+            screen.blit(label, (posX, screen.get_height() / 1.25))
 
         pygame.display.flip()
         
