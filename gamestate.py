@@ -89,16 +89,16 @@ class Worm:
                 key = self.keyQueue.popleft()
                 b = self.blocks[len(self.blocks)-1]
                 b2 = self.blocks[len(self.blocks)-2] #to check that cannot move to previous block "inside itself"
-                if key == pygame.K_UP and (b.y - 1 <> b2.y or b.x <> b2.x):
+                if key == pygame.K_UP and (b.y - 1 != b2.y or b.x != b2.x):
                     b.dirY = -1
                     b.dirX = 0
-                if key == pygame.K_DOWN and (b.y + 1 <> b2.y or b.x <> b2.x):
+                if key == pygame.K_DOWN and (b.y + 1 != b2.y or b.x != b2.x):
                     b.dirY = 1
                     b.dirX = 0
-                if key == pygame.K_LEFT and (b.y <> b2.y or b.x - 1 <> b2.x):
+                if key == pygame.K_LEFT and (b.y != b2.y or b.x - 1 != b2.x):
                     b.dirX = -1
                     b.dirY = 0
-                if key == pygame.K_RIGHT and (b.y <> b2.y or b.x + 1 <> b2.x):
+                if key == pygame.K_RIGHT and (b.y != b2.y or b.x + 1 != b2.x):
                     b.dirX = 1
                     b.dirY = 0
             
@@ -111,7 +111,7 @@ class Worm:
                 print("Collision with wall!")
                 self.hp -= 1
             #following special checks are so that worm can "go around", following its own tail
-            elif collision == 2 and (newBlock.x <> self.blocks[0].x or newBlock.y <> self.blocks[0].y):
+            elif collision == 2 and (newBlock.x != self.blocks[0].x or newBlock.y != self.blocks[0].y):
                 print("Collision with worm!")
                 self.hp -= 1
                 #print("Collision, new coords " + str(newBlock.x) + ", " + str(newBlock.y) + " vs " + str(self.blocks[0].x) + ", " + str(self.blocks[0].y))
@@ -151,7 +151,6 @@ class GameState(State):
         e = 0
         while True:
             newFoodX = random.randint(1, self.blocks - 2)
-            random.jumpahead(random.randint(1, self.blocks - 2))
             newFoodY = random.randint(1, self.blocks - 2)
             e += 1
             print("Randomizing " + str(e))
